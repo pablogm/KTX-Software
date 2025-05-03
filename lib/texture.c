@@ -831,32 +831,35 @@ ktxTexture_rowInfo(ktxTexture* This, ktx_uint32_t level,
  * @~English
  * @brief Return pitch between rows of a texture image level in bytes.
  *
- * For uncompressed textures the pitch is the number of bytes between
- * rows of texels. For compressed textures it is the number of bytes
- * between rows of blocks. The value is padded to GL_UNPACK_ALIGNMENT,
- * if necessary. For all currently known compressed formats padding
- * will not be necessary.
+ * For uncompressed textures, the pitch is the number of bytes between
+ * rows of texels (width × bytesPerPixel). For block‑compressed textures,
+ * the pitch is the number of bytes between rows of compression blocks,
+ * computed with ceiling division to include any partial blocks
+ * (ceil(width/blockWidth) × bytesPerBlock). The resulting value is then
+ * padded to GL_UNPACK_ALIGNMENT (or the platform’s required alignment)
+ * if necessary.
  *
  * @param[in]     This     pointer to the ktxTexture object of interest.
- * @param[in]     level    level of interest.
+ * @param[in]     level    mipmap level of interest.
  *
  * @return  the row pitch in bytes.
  */
- ktx_uint32_t
- ktxTexture_GetRowPitch(ktxTexture* This, ktx_uint32_t level)
- {
-    DECLARE_PROTECTED(ktxTexture)
-    struct blockCount {
-        ktx_uint32_t x;
-    } blockCount;
+ktx_uint32_t
+ktxTexture_GetRowPitch(ktxTexture* This, ktx_uint32_t level)
+{
+    DECLARE_PROTECTED(ktxTexture);
     ktx_uint32_t pitch;
 
-    blockCount.x = MAX(1, (This->baseWidth / prtctd->_formatSize.blockWidth)  >> level);
-    pitch = blockCount.x * prtctd->_formatSize.blockSizeInBits / 8;
+    ktx_uint32_t mipWidth = MAX(1U, This->baseWidth >> level);
+
+    ktx_uint32_t blocksAcross = (mipWidth + prtctd->_formatSize.blockWidth - 1U) / prtctd->_formatSize.blockWidth;
+
+    pitch = blocksAcross * (prtctd->_formatSize.blockSizeInBits / 8U);
+
     (void)padRow(&pitch);
 
     return pitch;
- }
+}
 
 /**
  * @memberof ktxTexture @private
