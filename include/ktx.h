@@ -977,6 +977,9 @@ ktxTexture_GetData(ktxTexture* This);
 KTX_API ktx_uint32_t KTX_APIENTRY
 ktxTexture_GetRowPitch(ktxTexture* This, ktx_uint32_t level);
 
+KTX_API ktx_uint32_t KTX_APIENTRY
+ktxTexture_GetRowPitch_Naf(ktxTexture* This, ktx_uint32_t level);
+
  /*
   * Return the element size of the texture's images.
   */
