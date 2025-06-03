@@ -845,7 +845,23 @@ ktxTexture_rowInfo(ktxTexture* This, ktx_uint32_t level,
  * @return  the row pitch in bytes.
  */
 ktx_uint32_t
-ktxTexture_GetRowPitch(ktxTexture* This, ktx_uint32_t level)
+ ktxTexture_GetRowPitch(ktxTexture* This, ktx_uint32_t level)
+ {
+    DECLARE_PROTECTED(ktxTexture)
+    struct blockCount {
+        ktx_uint32_t x;
+    } blockCount;
+    ktx_uint32_t pitch;
+
+    blockCount.x = MAX(1, (This->baseWidth / prtctd->_formatSize.blockWidth)  >> level);
+    pitch = blockCount.x * prtctd->_formatSize.blockSizeInBits / 8;
+    (void)padRow(&pitch);
+
+    return pitch;
+ }
+
+ktx_uint32_t
+ktxTexture_GetRowPitch_Naf(ktxTexture* This, ktx_uint32_t level)
 {
     DECLARE_PROTECTED(ktxTexture);
     ktx_uint32_t pitch;
